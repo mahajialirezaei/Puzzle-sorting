@@ -161,8 +161,3 @@ python Puzzle-sorting.py -a dfs -d 20 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0
 
 Developed by [Mohammad Amin Haji Alirezaei](https://github.com/mahajialirezaei)
 Feel free to ⭐️ this repo or open an issue if you'd like to contribute or have questions!
-This project is released under the **MIT License**. See [LICENSE](LICENSE) for details.
-
-```
-::contentReference[oaicite:0]{index=0}
-```
