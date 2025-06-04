@@ -47,7 +47,8 @@ def puzzle_sorting(puzzle):
         visited.add(current)
 
         zero_idx = current.index(0)
-        for neighbor in find_neighbor(zero_idx):
+        neighbors = find_neighbor(zero_idx)
+        for neighbor in neighbors:
             new_state = list(current)
             new_state[zero_idx], new_state[neighbor] = new_state[neighbor], new_state[zero_idx]
             new_state_tuple = tuple(new_state)
