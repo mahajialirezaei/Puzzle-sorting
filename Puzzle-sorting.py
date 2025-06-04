@@ -65,3 +65,4 @@ puzzle = [
 ]
 
 moves = puzzle_sorting(puzzle)
+print("moves :" + str(moves))
