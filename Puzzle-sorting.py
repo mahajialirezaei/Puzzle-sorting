@@ -1,4 +1,5 @@
-import heapq
+import sys
+sys.setrecursionlimit(10000)
 
 def manhattan_distance(state):
     distance = 0
@@ -10,8 +11,8 @@ def manhattan_distance(state):
         distance += abs(goal_row - curr_row) + abs(goal_col - curr_col)
     return distance
 
-def find_neighbor(zero: int) -> list:
-    r, c = divmod(zero, 4)
+def find_neighbors(zero_idx):
+    r, c = divmod(zero_idx, 4)
     directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
     neighbors = []
     for dr, dc in directions:
@@ -20,43 +21,63 @@ def find_neighbor(zero: int) -> list:
             neighbors.append(x * 4 + y)
     return neighbors
 
-def print_path(path: list):
+
+def print_path(path):
     for step, state in enumerate(path):
-        print("step" + str(step) + ":")
+        print("step :" + str(step))
         for i in range(0, 16, 4):
             print(state[i:i+4])
         print()
 
-def puzzle_sorting(puzzle):
-    start = tuple(num for row in puzzle for num in row)
-    goal = tuple(list(range(1, 16)) + [0])
+def puzzle_sorting(start, goal):
 
-    open_set = []
-    heapq.heappush(open_set, (manhattan_distance(start), 0, start, [start]))
-    visited = set()
+    path = [start]
+    zero_idx = start.index(0)
+    threshold = manhattan_distance(start)
 
-    while open_set:
-        f, g, current, path = heapq.heappop(open_set)
+    result_path = None
 
-        if current == goal:
-            print_path(path)
-            return g
+    def dfs(state, g, threshold, zero_idx, prev_zero):
+        nonlocal result_path
 
-        if current in visited:
-            continue
-        visited.add(current)
+        h = manhattan_distance(state)
+        f = g + h
 
-        zero_idx = current.index(0)
-        neighbors = find_neighbor(zero_idx)
+        if f > threshold:
+            return f
+
+        if state == goal:
+            result_path = path.copy()
+            return "FOUND"
+
+        min_threshold = float('inf')
+
+        neighbors = find_neighbors(zero_idx)
         for neighbor in neighbors:
-            new_state = list(current)
+            if neighbor == prev_zero:
+                continue
+
+            new_state = list(state)
             new_state[zero_idx], new_state[neighbor] = new_state[neighbor], new_state[zero_idx]
             new_state_tuple = tuple(new_state)
-            if new_state_tuple not in visited:
-                new_g = g + 1
-                new_f = new_g + manhattan_distance(new_state_tuple)
-                heapq.heappush(open_set, (new_f, new_g, new_state_tuple, path + [new_state_tuple]))
-    return -1
+
+            path.append(new_state_tuple)
+            temp = dfs(new_state_tuple, g + 1, threshold, neighbor, zero_idx)
+            if temp == "FOUND":
+                return "FOUND"
+            if isinstance(temp, int) and temp < min_threshold:
+                min_threshold = temp
+            path.pop()
+
+        return min_threshold
+
+    while True:
+        temp = dfs(start, 0, threshold, zero_idx, -1)
+        if temp == "FOUND":
+            return result_path
+        if temp == float('inf'):
+            return None
+        threshold = temp
 
 puzzle = [
     [1, 2, 0, 3],
@@ -64,6 +85,12 @@ puzzle = [
     [9, 10, 11, 8],
     [13, 14, 15, 12]
 ]
+start_state = tuple(num for row in puzzle for num in row)
+goal_state = tuple(list(range(1, 16)) + [0])
 
-moves = puzzle_sorting(puzzle)
-print("moves :" + str(moves))
+solution_path = puzzle_sorting(start_state, goal_state)
+if solution_path is not None:
+    print("moves :" + str(len(solution_path) - 1))
+    print_path(solution_path)
+else:
+    print("not found")
