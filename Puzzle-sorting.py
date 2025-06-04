@@ -1,6 +1,19 @@
 import sys
 sys.setrecursionlimit(10000)
 
+def is_solvable(state):
+    check_ls = [x for x in state if x !=0]
+    check_flag = 0
+    for i in range(15):
+        for j in range(i+1, 15):
+            if check_ls[i] > check_ls[j]:
+                check_flag += 1
+    zero_idx = state.index(0)
+    zero_row_from_top = zero_idx // 4
+    row_from_bottom = 4 - zero_row_from_top
+
+    return (check_flag + row_from_bottom) % 2 == 1
+
 def manhattan_distance(state):
     distance = 0
     for idx, val in enumerate(state):
@@ -85,12 +98,20 @@ puzzle = [
     [9, 10, 11, 8],
     [13, 14, 15, 12]
 ]
+
+
+
 start_state = tuple(num for row in puzzle for num in row)
 goal_state = tuple(list(range(1, 16)) + [0])
 
-solution_path = puzzle_sorting(start_state, goal_state)
-if solution_path is not None:
-    print("moves :" + str(len(solution_path) - 1))
-    print_path(solution_path)
-else:
-    print("not found")
+
+if not is_solvable(start_state):
+    print("not solvable")
+
+else :
+    solution_path = puzzle_sorting(start_state, goal_state)
+    if solution_path is not None:
+        print("moves :" + str(len(solution_path) - 1))
+        print_path(solution_path)
+    else:
+        print("not found")
